@@ -3,13 +3,17 @@
 # Mode 1 : Compression
 # 1. Finding character frequency
 # 2. Implementimg priority queue with linked list
-# 3. Building the Huffman tree 
+# 3. Building the Huffman tree
 # 4. Giving each character with their respective binary sequence
 # 5. Replacing .txt file with the encoded .cmp file
 
 # Mode 2 : Decompression
 # 1. read, until it makes sense :)
+
+
 print("________________________________________________________________")
+
+
 class Node:
     def __init__(self, key, value):
         self.key = key
@@ -17,6 +21,7 @@ class Node:
         self.next = None
         self.left = None
         self.right = None
+
 
 class priorityQueue:
     def __init__(self):
@@ -59,12 +64,12 @@ class priorityQueue:
         if self.isEmpty():
             raise Exception("Priority queue is empty")
         return self.head
-    
+
     def print_queue(self):
         """Prints the elements of the queue in priority order."""
         curr = self.head
         while curr:
-            print((curr.key,curr.value), end=" -> ")
+            print((curr.key, curr.value), end=" -> ")
             curr = curr.next
         print("None")
 
@@ -77,42 +82,74 @@ class priorityQueue:
             curr = curr.next
         return count
 
+
 inp = "Lorem Ipsum is simply dummy text of the printing and typesetting industry."
 
 # 1.1
-def frequency(inp) :
+
+
+def frequency(inp):
     frequency = {}
     for character in inp:
         if not character in frequency:
             frequency[character] = 0
         frequency[character] += 1
     return frequency
-    #for key in frequency:
+    # for key in frequency:
     #   print(key, frequency[key])
 
-# 1.2 
-def makePQ(freq) :
+# 1.2
+
+
+def makePQ(freq):
     PQ = priorityQueue()
-    for key in freq :
+    for key in freq:
         PQ.enqueue(key, freq[key])
     return PQ
- 
+
  # 1.3
 PQ = makePQ(frequency(inp))
 root = None
-while(PQ.len()>1) :
+while (PQ.len() > 1):
     node1 = PQ.dequeue()
     node2 = PQ.dequeue()
 
     sumNode = Node(node1.key + node2.key, node1.value + node2.value)
     sumNode.left = node1
     sumNode.right = node2
-    
+
     root = sumNode
 
     PQ.enqueueNode(sumNode)
 
-#test
-for i in range (5):
-    print(root.key, root.value)
-    root = root.left
+# 1.4
+encoded = {}
+cstr = ""
+
+
+def binarySequencing(node, cstr):
+    if node == None:
+        return
+
+    if (len(node.key) == 1):
+        encoded[node.key] = cstr
+        return
+
+    binarySequencing(node.left, cstr + "0")
+    binarySequencing(node.right, cstr + "1")
+
+
+binarySequencing(root, cstr)
+
+
+# 1.5
+encodedText = ""
+for character in inp:
+    encodedText += encoded[character]
+
+reconstructionTable = ""
+for key in encoded:
+    reconstructionTable += key+encoded[key]
+
+outp = reconstructionTable + "\n" + encodedText
+print(outp)
