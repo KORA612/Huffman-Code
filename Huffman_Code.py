@@ -1,17 +1,21 @@
 # Huffman Code
 
+# Note : In this project the main focus is on writing this program in a "step by step" manner.
+
 # Mode 1 : Compression
+# 0. Read the input file
 # 1. Finding character frequency
 # 2. Implementimg priority queue with linked list
 # 3. Building the Huffman tree
 # 4. Giving each character with their respective binary sequence
-# 5. Replacing .txt file with the encoded .cmp file
+# 5. Create output file with first line as reconstruction table and second line as encoded text
 
 # Mode 2 : Decompression
 # 1. read, until it makes sense :)
 
 
-print("________________________________________________________________")
+import tkinter as tk
+from tkinter import filedialog
 
 
 class Node:
@@ -83,8 +87,11 @@ class priorityQueue:
         return count
 
 
-inp = "Lorem Ipsum is simply dummy text of the printing and typesetting industry."
-
+def browse_and_select():
+    filepath = filedialog.askopenfilename()
+    if filepath:
+        print(f"Selected file: {filepath}")
+        Mode1(filepath)
 # 1.1
 
 
@@ -95,8 +102,6 @@ def frequency(inp):
             frequency[character] = 0
         frequency[character] += 1
     return frequency
-    # for key in frequency:
-    #   print(key, frequency[key])
 
 # 1.2
 
@@ -107,24 +112,25 @@ def makePQ(freq):
         PQ.enqueue(key, freq[key])
     return PQ
 
- # 1.3
-PQ = makePQ(frequency(inp))
-root = None
-while (PQ.len() > 1):
-    node1 = PQ.dequeue()
-    node2 = PQ.dequeue()
+# 1.3
 
-    sumNode = Node(node1.key + node2.key, node1.value + node2.value)
-    sumNode.left = node1
-    sumNode.right = node2
 
-    root = sumNode
+def HuffmanTree(PQ):
+    root = None
+    while (PQ.len() > 1):
+        node1 = PQ.dequeue()
+        node2 = PQ.dequeue()
 
-    PQ.enqueueNode(sumNode)
+        sumNode = Node(node1.key + node2.key, node1.value + node2.value)
+        sumNode.left = node1
+        sumNode.right = node2
+
+        root = sumNode
+
+        PQ.enqueueNode(sumNode)
+    return root
 
 # 1.4
-encoded = {}
-cstr = ""
 
 
 def binarySequencing(node, cstr):
@@ -139,17 +145,49 @@ def binarySequencing(node, cstr):
     binarySequencing(node.right, cstr + "1")
 
 
-binarySequencing(root, cstr)
-
-
 # 1.5
-encodedText = ""
-for character in inp:
-    encodedText += encoded[character]
+encoded = {}
 
-reconstructionTable = ""
-for key in encoded:
-    reconstructionTable += key+encoded[key]
 
-outp = reconstructionTable + "\n" + encodedText
-print(outp)
+def Mode1(filepath):
+    with open(filepath, "r") as inf:
+        inp = inf.read()         # 1.0
+    inf.close()
+
+    freq = frequency(inp)         # 1.1
+
+    PQ = makePQ(freq)             # 1.2
+    # PQ.print_queue() # See each character in order of how many times they appeared.
+    root = HuffmanTree(PQ)        # 1.3
+    # PQ.print_queue() # See every character used and total character count.
+    binarySequencing(root, "")  # 1.4
+
+    encodedText = ""
+    for character in inp:
+        encodedText += encoded[character]
+
+    reconstructionTable = ""
+    for key in encoded:
+        reconstructionTable += key+encoded[key]
+
+    outp = reconstructionTable + "\n" + encodedText
+
+    with open("output.txt", "w") as outf:
+        outf.write(outp)
+    outf.close()
+
+
+root = tk.Tk()
+root.title("File Browser")
+
+button_font = ("Arial", 32, "bold")
+button_width = 20
+button_height = 2
+browse_button = tk.Button(root, text="Browse", command=browse_and_select,
+                          font=button_font, width=button_width, height=button_height)
+browse_button.pack()
+
+browse_button.configure(bg="#223843", fg="#dbd3d8",
+                        highlightbackground="#ffffff",)
+
+root.mainloop()
