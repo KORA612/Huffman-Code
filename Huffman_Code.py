@@ -70,7 +70,6 @@ class priorityQueue:
         return self.head
 
     def print_queue(self):
-        """Prints the elements of the queue in priority order."""
         curr = self.head
         while curr:
             print((curr.key, curr.value), end=" -> ")
@@ -78,7 +77,6 @@ class priorityQueue:
         print("None")
 
     def len(self):
-        """Counts the number of elements in the queue."""
         count = 0
         curr = self.head
         while curr:
@@ -90,8 +88,11 @@ class priorityQueue:
 def browse_and_select():
     filepath = filedialog.askopenfilename()
     if filepath:
-        print(f"Selected file: {filepath}")
-        Mode1(filepath)
+        print("Selected file:", filepath)
+        if ".txt" in filepath:
+            Mode1(filepath)
+        elif ".cmp" in filepath:
+            Mode2(filepath)
 # 1.1
 
 
@@ -168,14 +169,71 @@ def Mode1(filepath):
 
     reconstructionTable = ""
     for key in encoded:
-        reconstructionTable += key+encoded[key]
+        if key == "0":
+            reconstructionTable += chr(6)+encoded[key]
+        elif key == "1":
+            reconstructionTable += chr(7)+encoded[key]
+        else:
+            reconstructionTable += key+encoded[key]
 
-    outp = reconstructionTable + "\n" + encodedText
+    outp = str(len(reconstructionTable)) + "\n" + \
+        reconstructionTable + encodedText
 
-    with open("output.txt", "w") as outf:
+    with open("output.cmp", "w") as outf:
         outf.write(outp)
     outf.close()
 
+    print("‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾")
+    print("Task Completed!")
+    print("___________________________________________")
+
+# 2
+
+
+def Mode2(filepath):
+    with open(filepath, "r") as inf:
+        lenstr = inf.readline()
+        inp = inf.read()
+    inf.close()
+
+    len = int(lenstr)
+    reconstructionTable = inp[:len]
+    pastCharacter = reconstructionTable[0]
+    reconstructionTable = inp[1:len]
+    encodedtxt = inp[len:]
+
+    rec = {}
+    tmp = ""
+    for character in reconstructionTable:
+        if character == "0" or character == "1":
+            tmp += character
+        else:
+            rec[tmp] = pastCharacter
+            tmp = ""
+            pastCharacter = character
+    rec[tmp] = pastCharacter
+
+    # print(rec)
+
+    temp = ""
+    decodeded = ""
+    for character in encodedtxt:
+        temp += character
+        for key in rec:
+            if key == temp:
+                if rec[temp] == chr(6):
+                    decodeded += "0"
+                if rec[temp] == chr(7):
+                    decodeded += "1"
+                else:
+                    decodeded += rec[temp]
+                temp = ""
+    print("‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾")
+    print(decodeded)
+    print("___________________________________________")
+
+
+# UI Setup
 
 root = tk.Tk()
 root.title("File Browser")

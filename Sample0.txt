@@ -1,0 +1,4 @@
+Hello World!
+This is Sample.txt
+is it like 123456789 words?
+ABCDEFGHIJKLMNOPQRSTUVWXYZ
